@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+    <body>
+        <script>
+            let trabajador = new Worker("003-trabajador1.js");
+            console.log("Te envio un mensaje")
+            trabajador.postMessage("Hola");
+
+            trabajador.onmessage = function(){
+                console.log("El trabajdor me ha respondido")
+            }
+        
+        </script>
+    </body>
+</html>
