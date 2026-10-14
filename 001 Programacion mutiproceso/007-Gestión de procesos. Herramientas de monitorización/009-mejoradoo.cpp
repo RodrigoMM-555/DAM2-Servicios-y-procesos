@@ -7,6 +7,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <cstdlib>
 
 using namespace cv;
 using namespace std;
@@ -178,11 +179,19 @@ void clasificar(
 // PROGRAMA PRINCIPAL
 // ============================================
 
+bool hayEntornoGrafico() {
+    const char *display = std::getenv("DISPLAY");
+    const char *wayland = std::getenv("WAYLAND_DISPLAY");
+    return (display != nullptr && display[0] != '\0') ||
+           (wayland != nullptr && wayland[0] != '\0');
+}
+
 int main() {
 
     // Evitar paralelismo anidado de OpenCV
     cv::setNumThreads(1);
 
+    bool usarVentana = hayEntornoGrafico();
     int hilos = omp_get_max_threads();
 
     cout << "OpenMP: " << hilos << " hilos\n";
@@ -254,7 +263,8 @@ int main() {
 
     Mat imagen(ALTO, ANCHO, CV_8UC3);
 
-    namedWindow("Saturno OpenMP", WINDOW_AUTOSIZE);
+    if (usarVentana)
+        namedWindow("Saturno OpenMP", WINDOW_AUTOSIZE);
 
     float dt = 0.15f;
     bool pausado = false;
@@ -468,32 +478,49 @@ int main() {
             0.45, Scalar(160, 160, 160),
             1, LINE_AA);
 
-        imshow("Saturno OpenMP", imagen);
+        if (usarVentana) {
+            imshow("Saturno OpenMP", imagen);
 
-        // ====================================
-        // 7. CONTROLES
-        // ====================================
+            // ====================================
+            // 7. CONTROLES
+            // ====================================
 
-        int tecla = waitKey(1);
+            int tecla = waitKey(1);
 
-        if (tecla == 27)
-            break;
+            if (tecla == 27)
+                break;
 
-        if (tecla == ' ')
-            pausado = !pausado;
+            if (tecla == ' ')
+                pausado = !pausado;
 
-        if (tecla == '+' || tecla == '=')
-            dt = min(1.0f, dt + 0.025f);
+            if (tecla == '+' || tecla == '=')
+                dt = min(1.0f, dt + 0.025f);
 
-        if (tecla == '-')
-            dt = max(0.025f, dt - 0.025f);
+            if (tecla == '-')
+                dt = max(0.025f, dt - 0.025f);
 
-        if (getWindowProperty(
-                "Saturno OpenMP",
-                WND_PROP_VISIBLE) < 1)
-            break;
+            if (getWindowProperty(
+                    "Saturno OpenMP",
+                    WND_PROP_VISIBLE) < 1)
+                break;
+        } else {
+            static int framesSinGUI = 0;
+            framesSinGUI++;
+
+            if (framesSinGUI % 30 == 0) {
+                string nombre = "/tmp/saturno_frame_" + to_string(framesSinGUI / 30) + ".png";
+                imwrite(nombre, imagen);
+                cout << "Frame guardado: " << nombre << endl;
+            }
+
+            if (framesSinGUI >= 180) {
+                cout << "Modo sin GUI: salida automática tras 180 frames de prueba." << endl;
+                break;
+            }
+        }
     }
 
-    destroyAllWindows();
+    if (usarVentana)
+        destroyAllWindows();
     return 0;
 }
