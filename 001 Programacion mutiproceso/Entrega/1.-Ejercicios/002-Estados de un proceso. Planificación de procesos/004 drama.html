@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+  </head>
+  <body>
+    <canvas id="lienzo" width=2048 height=2048></canvas>
+    <script>
+      const lienzo = document.querySelector("#lienzo")
+      const contexto = lienzo.getContext("2d")
+      
+      let imagen = new Image();
+      imagen.src = "img.jpg"
+      
+      let temporizador;
+      let x = 0;
+      let y = 0;
+      let anchocacho = 256;
+      
+      
+      imagen.onload = function(){
+      	contexto.drawImage(imagen,0,0,2048,2048)
+        let anchocacho = 256;
+       	temporizador = setTimeout("bucle()",1000)
+      }
+      
+      function bucle(){
+        procesaCacho(x,y)
+        y+=anchocacho
+        if(y > 2048){
+        	y = 0;x+=anchocacho;
+        }
+      	clearTimeout("bucle()",1000)
+        temporizador = setTimeout("bucle()",1000)
+      }
+      
+      function procesaCacho(x,y){
+      	let cacho = contexto.getImageData(x,y,256,256);
+        console.log(cacho)
+        let datos = cacho.data;
+        const filtroRojo = Math.floor(Math.random() * 56);
+        const filtroVerde = Math.floor(Math.random() * 56);
+        const filtroAzul = Math.floor(Math.random() * 56);
+        for(let i = 0;i<cacho.data.length;i+=4){
+          datos[i] = Math.min(255, 255 - datos[i] + filtroRojo);
+          datos[i+1] = Math.min(255, 255 - datos[i+1] + filtroVerde);
+          datos[i+2] = Math.min(255, 255 - datos[i+2] + filtroAzul);
+        }
+        contexto.putImageData(cacho,x,y)
+      }
+    </script>
+  </body>
+</html>
