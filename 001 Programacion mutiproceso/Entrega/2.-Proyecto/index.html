@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prisma · Procesado de imagen en paralelo</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+  <header>
+    <div class="marca">
+      <span class="logo" aria-hidden="true"></span>
+      <div>
+        <h1>Prisma</h1>
+        <p>Procesado de imagen en paralelo con Web Workers</p>
+      </div>
+    </div>
+    <div class="chips">
+      <span class="chip" id="nucleos"></span>
+      <span class="chip" id="dimensiones"></span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ CONTROLES ============ -->
+    <aside id="controles" class="panel">
+
+      <section>
+        <h2>Imagen</h2>
+        <input type="file" id="archivo" accept="image/*">
+        <div class="fila-botones">
+          <button id="restaurar">Restaurar</button>
+          <button id="descargar">Descargar PNG</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Filtro</h2>
+        <label>Filtro
+          <select id="filtro"></select>
+        </label>
+        <label>Intensidad <output id="vIntensidad">50</output>
+          <input type="range" id="intensidad" min="1" max="100" value="50">
+        </label>
+        <label class="check">
+          <input type="checkbox" id="acumular"> Aplicar sobre el resultado anterior
+        </label>
+      </section>
+
+      <section>
+        <h2>Ejecución</h2>
+        <label>Modo
+          <select id="modo">
+            <option value="workers">Web Workers (paralelo)</option>
+            <option value="principal">Hilo principal (secuencial)</option>
+          </select>
+        </label>
+        <label id="filaWorkers">Workers <output id="vWorkers"></output>
+          <input type="range" id="nWorkers" min="1" max="32">
+        </label>
+        <label>Tamaño de tesela
+          <select id="tamTesela">
+            <option value="64">64 px</option>
+            <option value="128">128 px</option>
+            <option value="256" selected>256 px</option>
+            <option value="512">512 px</option>
+          </select>
+        </label>
+        <button id="procesar" class="primario">Procesar</button>
+        <button id="cancelar" class="peligro ancho" disabled>Cancelar</button>
+      </section>
+
+    </aside>
+
+    <!-- ============ IMAGEN ============ -->
+    <section id="escenario">
+      <div id="barraImagen">
+        <label class="interruptor">
+          <input type="checkbox" id="verTeselas" checked>
+          <span class="pista"></span>
+          Ver qué worker procesa cada tesela
+        </label>
+      </div>
+      <div id="marco">
+        <canvas id="lienzo"></canvas>
+        <canvas id="superposicion"></canvas>
+      </div>
+      <div id="progreso">
+        <div id="barra"></div>
+        <span id="textoProgreso">Listo</span>
+      </div>
+    </section>
+
+    <!-- ============ MONITOR ============ -->
+    <aside id="monitor" class="panel">
+
+      <section>
+        <h2>Hilo principal</h2>
+        <canvas id="latido" width="248" height="100"></canvas>
+        <p class="dato"><span id="fps">— fps</span></p>
+        <p class="dato aviso" id="bloqueo"></p>
+      </section>
+
+      <section>
+        <h2>Workers</h2>
+        <ul id="listaWorkers"></ul>
+      </section>
+
+    </aside>
+
+  </main>
+
+  <!-- ============ RESULTADOS ============ -->
+  <section id="resultados">
+
+    <div class="panel">
+      <h2>Ejecuciones</h2>
+      <div class="tabla-scroll">
+        <table id="tablaResultados">
+          <thead>
+            <tr>
+              <th>#</th><th>Filtro</th><th>Modo</th><th>Workers</th>
+              <th>Tesela · nº</th><th class="num">ms</th><th class="num">Speedup</th><th class="num">Eficiencia</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="nota">Speedup = tiempo con 1 proceso ÷ tiempo con N. Eficiencia = speedup ÷ N.
+        La referencia es la última ejecución con 1 worker o en el hilo principal con el mismo filtro, intensidad y tesela.</p>
+      <p class="nota" id="servidor"></p>
+    </div>
+
+  </section>
+
+  <script src="filtros.js"></script>
+  <script src="principal.js"></script>
+</body>
+</html>
