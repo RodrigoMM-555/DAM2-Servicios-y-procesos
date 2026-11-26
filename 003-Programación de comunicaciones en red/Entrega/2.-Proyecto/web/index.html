@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Garabato · pizarra colaborativa</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<header>
+  <h1>Garabato <span>pizarra colaborativa + chat</span></h1>
+
+  <div class="identidad">
+    <label for="nombre">Nombre</label>
+    <input id="nombre" maxlength="20" autocomplete="off">
+  </div>
+
+  <div class="red">
+    <span id="estado" class="estado desconectado">Desconectado</span>
+    <span id="ping" title="Latencia de ida y vuelta (ping/pong por WebSocket)">– ms</span>
+    <span id="contadores" title="Mensajes enviados / recibidos">↑0 ↓0</span>
+  </div>
+</header>
+
+<main>
+
+  <section class="pizarra">
+    <div class="herramientas">
+      <div id="paleta" class="paleta"></div>
+      <input id="color" type="color" value="#1f2937" title="Otro color">
+      <label class="grosor">
+        Grosor <input id="grosor" type="range" min="1" max="40" value="4">
+        <output id="vGrosor">4</output>
+      </label>
+      <button id="goma" class="alternar" title="Goma (pinta en blanco)">Goma</button>
+      <span class="hueco"></span>
+      <button id="descargar">Descargar PNG</button>
+      <button id="borrar" class="peligro">Borrar todo</button>
+    </div>
+
+    <div id="zona" class="zona">
+      <canvas id="lienzo" width="1600" height="1000"></canvas>
+      <div id="cursores"></div>
+    </div>
+  </section>
+
+  <aside>
+    <section class="panel">
+      <h2>Conectados <span id="nUsuarios">0</span></h2>
+      <ul id="usuarios"></ul>
+    </section>
+
+    <section class="panel chat">
+      <h2>Chat</h2>
+      <div id="mensajes"></div>
+      <form id="formulario">
+        <input id="texto" placeholder="Escribe un mensaje…" maxlength="500" autocomplete="off">
+        <button>Enviar</button>
+      </form>
+    </section>
+  </aside>
+
+</main>
+
+<script src="pizarra.js"></script>
+</body>
+</html>
