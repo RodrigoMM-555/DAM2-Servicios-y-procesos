@@ -1,29 +1,4 @@
 """
-servidor.py
------------
-Garabato · pizarra colaborativa con chat.
-
-Un mismo proceso levanta TRES servidores, cada uno en su propio hilo:
-
-  1. Servidor TCP (puerto 5000)  -> clientes de terminal (cliente.py o nc).
-     Socket "a pelo": socket.socket + bind + listen + accept.
-     Cada cliente tiene DOS hilos: uno lee y otro escribe.
-
-  2. Servidor WebSocket (puerto 8765) -> navegadores (web/).
-     Librería `websockets` sobre asyncio: un solo hilo atiende a todos
-     los navegadores con corrutinas.
-
-  3. Servidor HTTP (puerto 8000) -> sirve la página web (web/).
-     ThreadingHTTPServer: un hilo por petición.
-
-Todos comparten una única "Sala": quién está conectado, el dibujo
-(lista de trazos) y el historial del chat. La sala está protegida por
-un cerrojo (threading.Lock) porque la tocan muchos hilos a la vez.
-
-Protocolo: mensajes JSON. Por TCP va uno por línea (terminado en \n),
-porque TCP es un flujo de bytes sin fronteras entre mensajes.
-Por WebSocket, cada trama es un mensaje.
-
 Uso:
     python3 servidor.py
     python3 servidor.py --tcp 5000 --ws 8765 --http 8000 --host 0.0.0.0
